@@ -89,7 +89,7 @@ def softmax_loss_vectorized(W, X, y, reg):
     loss = data_loss + reg_loss
     
     p[np.arange(n), y] -= 1
-    dW = (X.T @ p)/n + 2 * reg * W
+    dW = (X.T @ p)/ns + 2 * reg * W
     
     # *****END OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
 
