@@ -122,7 +122,7 @@ for iter in range(max_iters):
 1. depthwise convolution: 每个卷积核只负责卷积一个通道,卷积核与通道一 一 对应, 共有 input_channel 个卷积核
 2. pointwise convolution: 用output_channel 个 1 x 1 x input_channel的卷积核在depthwise的输出上跨通道(Cross-channel on-depth)卷积
 #### ResNet
-1. Residual Block: 残差网络，加入跨层连接，将底层特征inject到更深的layer。use network layers to fit a resiual mapping instead of the direct underlying mapping. Traditional conv: x-->H(x), ResNet: H(x)= F(x) + x, F(x)由神经网络来学习
+1. Residual Block: 残差网络，加入跨层连接，将底层特征inject到更深的layer。use network layers to fit a resiual mapping instead of the direct underlying mapping. Traditional conv: x-->H(x), ResNet: H(x)= F(x) + x, F(x)由神经网络来学习。Use bottleneck layer to improve efficiency.
 2. ResNext: 为了让梯度更好的传递, 每一层的residual block由一个变成三个, 
 #### FPN 特征金字塔
 1. Top-down connection, lateral connection, add more features to learn
