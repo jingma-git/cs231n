@@ -1,2 +1,3 @@
 **/build/*
 **/datasets/cifar*
+**/datasets/MNIST_data/*
