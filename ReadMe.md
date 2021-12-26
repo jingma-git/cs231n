@@ -127,7 +127,24 @@ for iter in range(max_iters):
 #### FPN 特征金字塔
 1. Top-down connection, lateral connection, add more features to learn
 
-## Part2 GAN
+## Part2 GAN: Two Players' Game
+1. Generator: want to generate image as real as possible to deceive the discriminator.
+2. Discriminator: want to distinguish fake image (created by generator) from fake image.
+3. $min_G max_D \mathbb{E}_{x\sim p(data)}{log D(x)}   + \mathbb{E}_{z\sim p(z)}{log (1-D(G(z)))}$
+4. When train generator, instead of minimize $\mathbb{E}_{z\sim p(z)}{log (1-D(G(z)))}$ but maximize $\mathbb{E}_{z\sim p(z)}{log (D(G(z)))}$ to avoid "gradient nearly zero" induced by $log (1-D)$ curve.
+
+```python
+for iter in range(max_iters):
+	# train generator
+	sample z from guassian distribution
+	maximize log(D(G(z))
+	
+	# train discriminator
+	sample z from guassian distribution
+	get real samples x
+	maximize log(D(x)) + log(1-D(G(z)))
+	
+```
 
 ## Part3 Object Detection | Instance Segmentation
 #### To select ROI, we need NMS suppression
