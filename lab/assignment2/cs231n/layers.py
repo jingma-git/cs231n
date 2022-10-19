@@ -228,8 +228,12 @@ def batchnorm_forward(x, gamma, beta, bn_param):
         #######################################################################
         # *****START OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
 
-        pass
-
+        mean = np.mean(x, axis=0)
+        var = np.sum((x - mean) ** 2 , axis=0) / N
+        running_mean = momentum * running_mean + (1-momentum) * mean
+        running_var = momentum * running_var + (1-momentum) * var
+        out = (x - mean) / np.sqrt(var + eps) 
+        # gamma? beta?
         # *****END OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
         #######################################################################
         #                           END OF YOUR CODE                          #
@@ -243,7 +247,7 @@ def batchnorm_forward(x, gamma, beta, bn_param):
         #######################################################################
         # *****START OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
 
-        pass
+        out = (x - running_mean) / np.sqrt(running_var + eps) 
 
         # *****END OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
         #######################################################################
@@ -769,3 +773,58 @@ def spatial_groupnorm_backward(dout, cache):
     #                             END OF YOUR CODE                            #
     ###########################################################################
     return dx, dgamma, dbeta
+
+
+if __name__ == "__main__":
+  from utils import print_mean_std, rel_error
+  # Check the training-time forward pass by checking means and variances
+  # of features both before and after batch normalization   
+
+  # Simulate the forward pass for a two-layer network.
+  np.random.seed(231)
+  N, D1, D2, D3 = 200, 50, 60, 3
+  X = np.random.randn(N, D1)
+  W1 = np.random.randn(D1, D2)
+  W2 = np.random.randn(D2, D3)
+  a = np.maximum(0, X.dot(W1)).dot(W2)
+
+  print('Before batch normalization:')
+  print_mean_std(a,axis=0)
+
+  gamma = np.ones((D3,))
+  beta = np.zeros((D3,))
+
+  # Means should be close to zero and stds close to one.
+  print('After batch normalization (gamma=1, beta=0)')
+  a_norm, _ = batchnorm_forward(a, gamma, beta, {'mode': 'train'})
+  print_mean_std(a_norm,axis=0)
+
+
+  # Check the test-time forward pass by running the training-time
+  # forward pass many times to warm up the running averages, and then
+  # checking the means and variances of activations after a test-time
+  # forward pass.
+
+  np.random.seed(231)
+  N, D1, D2, D3 = 200, 50, 60, 3
+  W1 = np.random.randn(D1, D2)
+  W2 = np.random.randn(D2, D3)
+
+  bn_param = {'mode': 'train'}
+  gamma = np.ones(D3)
+  beta = np.zeros(D3)
+
+  for t in range(50):
+    X = np.random.randn(N, D1)
+    a = np.maximum(0, X.dot(W1)).dot(W2)
+    batchnorm_forward(a, gamma, beta, bn_param)
+
+  bn_param['mode'] = 'test'
+  X = np.random.randn(N, D1)
+  a = np.maximum(0, X.dot(W1)).dot(W2)
+  a_norm, _ = batchnorm_forward(a, gamma, beta, bn_param)
+
+  # Means should be close to zero and stds close to one, but will be
+  # noisier than training-time forward passes.
+  print('After batch normalization (test-time):')
+  print_mean_std(a_norm,axis=0)
